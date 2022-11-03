@@ -13,8 +13,6 @@ schema:
     https://github.com/iDvel/rime-ice
   dependencies:
     - melt_eng
-    - liangfen
-
 
 # 功能开关
 switches:
@@ -61,7 +59,6 @@ engine:
     - lua_translator@date_translator             # 时间、日期、星期
     - table_translator@custom_phrase             # 自定义短语（固顶字） custom_phrase.txt
     - table_translator@melt_eng                  # 英文输入
-    - reverse_lookup_translator@liangfen         # 反查，两分拼字
   filters:
     - lua_filter@long_word_filter  # 长词优先
     - simplifier@emoji             # Emoji
@@ -150,16 +147,6 @@ recognizer:
     # punct: "^/([0-9]+[a-z]*|[a-z]+)$"
     punct: "^v([0-9]|10|[A-Za-z]+)$"  # 响应 punctuator/symbols(symbols_custom.yaml) 用「v」替换「/」并支持大写
     reverse_lookup: "^u[A-Za-z]+$"    # 响应两分的反查
-
-
-# 反查：两分（拼字）
-liangfen:
-  dictionary: liangfen
-  prefix: "u"  # 以 u 开头来反查
-  spelling_hints: 9
-  enable_completion: true # 补全提示
-  # tips: 〔两分〕
-
 
 # 拼写设定
 speller:
