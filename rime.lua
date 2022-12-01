@@ -2,9 +2,15 @@
 -------------------------------------------------------------
 -- 日期时间
 -- 提高权重的原因：因为在方案中设置了大于 1 的 initial_quality，导致 rq sj xq dt ts 产出的候选项在所有词语的最后。
-function date_translator(input, seg)
+function date_translator(input, seg, env)
+	local config = env.engine.schema.config
+	local date = config:get_string(env.name_space .."/date") or "rq"
+	local time = config:get_string(env.name_space .."/time") or "sj"
+	local week = config:get_string(env.name_space .."/week") or "xq"
+	local datetime = config:get_string(env.name_space .."/datetime") or "dt"
+	local timestamp = config:get_string(env.name_space .."/timestamp") or "ts"
     -- 日期
-    if (input == "rq") then
+    if (input == date) then
         local cand = Candidate("date", seg.start, seg._end, os.date("%Y-%m-%d"), "")
         cand.quality = 100
         yield(cand)
@@ -19,7 +25,7 @@ function date_translator(input, seg)
         yield(cand)
     end
     -- 时间
-    if (input == "sjj") then
+    if (input == time) then
         local cand = Candidate("time", seg.start, seg._end, os.date("%H:%M"), "")
         cand.quality = 100
         yield(cand)
@@ -28,17 +34,20 @@ function date_translator(input, seg)
         yield(cand)
     end
     -- 星期
-    if (input == "xq") then
+    if (input == week) then
         local weakTab = {'日', '一', '二', '三', '四', '五', '六'}
-        local cand = Candidate("week", seg.start, seg._end, "周" .. weakTab[tonumber(os.date("%w") + 1)], "")
+        local cand = Candidate("week", seg.start, seg._end, "星期" .. weakTab[tonumber(os.date("%w") + 1)], "")
         cand.quality = 100
         yield(cand)
-        local cand = Candidate("week", seg.start, seg._end, "星期" .. weakTab[tonumber(os.date("%w") + 1)], "")
+		local cand = Candidate("week", seg.start, seg._end, "礼拜" .. weakTab[tonumber(os.date("%w") + 1)], "")
+        cand.quality = 100
+        yield(cand)
+        local cand = Candidate("week", seg.start, seg._end, "周" .. weakTab[tonumber(os.date("%w") + 1)], "")
         cand.quality = 100
         yield(cand)
     end
     -- ISO 8601/RFC 3339 的时间格式 （固定东八区）（示例 2022-01-07T20:42:51+08:00）
-    if (input == "dt") then
+    if (input == datetime) then
         local cand = Candidate("datetime", seg.start, seg._end, os.date("%Y-%m-%dT%H:%M:%S+08:00"), "")
         cand.quality = 100
         yield(cand)
@@ -47,11 +56,11 @@ function date_translator(input, seg)
         yield(cand)
     end
     -- 时间戳（十位数，到秒，示例 1650861664）
-    -- if (input == "ts") then
-    --     local cand = Candidate("datetime", seg.start, seg._end, os.time(), "")
-    --     cand.quality = 100
-    --     yield(cand)
-    -- end
+    if (input == timestamp) then
+        local cand = Candidate("datetime", seg.start, seg._end, os.time(), "")
+        cand.quality = 100
+        yield(cand)
+    end
 end
 -------------------------------------------------------------
 -- 以词定字
@@ -139,10 +148,12 @@ end
 -- 长词优先（提升「西安」「提案」「图案」「饥饿」等词汇的优先级）
 -- 感谢&参考于： https://github.com/tumuyan/rime-melt
 -- 修改：不提升英文和中英混输的
-function long_word_filter(input)
-    -- 目前的效果：将 2 个词插入到第 4、5 个候选项
-    local count = 2 -- 提升 count 个词语
-    local idx = 4 -- 插入到第 idx 位
+function long_word_filter(input, env)
+    -- 提升 count 个词语，插入到第 idx 个位置，默认 2、4。
+	local config = env.engine.schema.config
+	local count = config:get_string(env.name_space .."/count") or 2
+    local idx = config:get_string(env.name_space .."/idx") or 4
+
 
     local l = {}
     local firstWordLength = 0 -- 记录第一个候选词的长度，提前的候选词至少要比第一个候选词长
@@ -152,7 +163,7 @@ function long_word_filter(input)
     local i = 1
     for cand in input:iter() do
         leng = utf8.len(cand.text)
-        if (firstWordLength < 1 or i < idx) then
+        if (firstWordLength < 1 or i < tonumber(idx)) then
             i = i + 1
             firstWordLength = leng
             yield(cand)
@@ -167,7 +178,7 @@ function long_word_filter(input)
 		--     end
 		-- 换了个正则，否则中英混输的也会被提升
 		-- elseif ((leng > firstWordLength) and (s2 < count)) and (string.find(cand.text, "^[%w%p%s]+$")==nil) then
-        elseif ((leng > firstWordLength) and (s2 < count)) and (string.find(cand.text, "[%w%p%s]+") == nil) then
+        elseif ((leng > firstWordLength) and (s2 < tonumber(count))) and (string.find(cand.text, "[%w%p%s]+") == nil) then
             yield(cand)
             s2 = s2 + 1
         else

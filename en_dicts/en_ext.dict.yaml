@@ -7,7 +7,7 @@
 #
 ---
 name: en_ext
-version: "2022-11-01"
+version: "2022-11-25"
 sort: by_weight
 ...
 # 一些杂项
@@ -517,7 +517,9 @@ CSS	CSS
 ID	ID
 OTC	OTC
 IEPL	IEPL
+International Ethernet Private Line	IEPL
 IPLC	IPLC
+International Private Leased Circuit	IPLC
 IntelliJ	IntelliJ
 IntelliJ IDEA	IntelliJIDEA
 IntelliJ IDEA Community	IntelliJIDEACommunity
@@ -1440,6 +1442,7 @@ North Atlantic Treaty Organization	NorthAtlanticTreatyOrganization
 MissWarmJ	MissWarmJ
 Miss	Miss
 NASA	NASA
+National Aeronautics and Space Administration	NASA
 Meta	Meta
 PictureView	PictureView
 RAM	RAM
@@ -1655,3 +1658,36 @@ tum	tum
 Sir	Sir
 rapper	rapper
 fucked	fucked
+Fedora	Fedora
+downbeat	downbeat
+hading	hading
+LeetCode	LeetCode
+danced	danced
+swept	swept
+spun	spun
+ghosts	ghosts
+admiral	admiral
+moonlit	moonlit
+Helvetica	Helvetica
+rewrite	rewrite
+limon	limon
+annotate	annotate
+annotated	annotated
+GFW	GFW
+Great Firewall	GFW
+Great Firewall	GreatFirewall
+departed	departed
+GeoIP	GeoIP
+Vimium	Vimium
+Nvim	Nvim
+Neovim	Neovim
+nerd	nerd
+MacVim	MacVim
+VimR	VimR
+plugin	plugin
+plugins	plugins
+buffer	buffer
+LunarVim	LunarVim
+IdeaVim	IdeaVim
+unfo	unfo
+timestamp	timestamp

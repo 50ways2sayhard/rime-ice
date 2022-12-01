@@ -6,10 +6,11 @@
 schema:
   schema_id: rime_ice
   name: 雾凇拼音
-  version: "1.0.1"
+  version: "1.0.5"
   author:
     - Dvel
   description: |
+    雾凇拼音
     https://github.com/iDvel/rime-ice
   dependencies:
     - melt_eng
@@ -36,8 +37,8 @@ switches:
 # 输入引擎
 engine:
   processors:
-    - lua_processor@select_character                               # 以词定字
-    - lua_processor@code_length_limit_processor@code_length_limit  # 限制码长
+    - lua_processor@select_character             # 以词定字
+    - lua_processor@code_length_limit_processor  # 限制码长
     - ascii_composer
     - recognizer
     - key_binder
@@ -57,7 +58,7 @@ engine:
     - script_translator
     - lua_translator@v_single_char_first_filter  # v 模式 symbols 优先（否则是英文优先）
     - lua_translator@date_translator             # 时间、日期、星期
-    - table_translator@custom_phrase             # 自定义短语（固顶字） custom_phrase.txt
+    - table_translator@custom_phrase             # 自定义短语 custom_phrase.txt
     - table_translator@melt_eng                  # 英文输入
   filters:
     - lua_filter@long_word_filter  # 长词优先
@@ -66,8 +67,24 @@ engine:
     - uniquifier                   # 去重
 
 
-# 限制码长，默认 100。（最多能输入 code_length_limit 个字符）
-# code_length_limit: 100
+# 限制码长，默认 100。（最多能输入的字符个数）
+code_length_limit_processor: 100
+
+
+# 日期、时间、星期、ISO 8601、时间戳的触发关键字
+date_translator:
+  date: rq       # 日期： 2022-11-29
+  time: sj       # 时间： 18:13
+  week: xq       # 星期： 星期二
+  datetime: dt   # ISO 8601： 2022-11-29T18:13:11+08:00
+  timestamp: ts  # 时间戳： 1669716794
+
+
+# 长词优先，提升 count 个词语，插入到第 idx 个位置，默认 2、4。
+# 示例：将 2 个词插入到第 4、5 个候选项，输入 jie 得到「1接 2解 3姐 4饥饿 5极恶」
+long_word_filter:
+  count: 2
+  idx: 4
 
 
 # 从 default 继承快捷键
@@ -84,25 +101,32 @@ emoji:
 
 # 简繁切换
 traditionalize:
-  opencc_config: s2t.json  # s2t.json | s2hk.json | s2tw.json | s2twp.json  参考 https://github.com/BYVoid/OpenCC
   option_name: traditionalization
-  tips: all  # 转换提示（即是否显示繁体对应的简体）: all 都显示 | char 仅单字显示 | none 不显示。
+  opencc_config: s2t.json             # s2t.json | s2hk.json | s2tw.json | s2twp.json  # 如果选择台湾繁体，长句子正常，但1~2个字时无法正确转换台湾繁体，仍然显示香港繁体，不知道为啥。
+  tips: all                           # 转换提示: all 都显示 | char 仅单字显示 | none 不显示。
+  excluded_types: [ reverse_lookup ]  # 不转换反查的内容，比如目前使用的两分输入方案的拼字
 
 
-# 自定义短语（固顶字）：custom_phrase.txt
+# 自定义短语：custom_phrase.txt
 custom_phrase:
   dictionary: ""
   user_dict: custom_phrase
   db_class: stabledb
   enable_completion: false # 补全提示
   enable_sentence: false   # 禁止造句
-  initial_quality: 99  # custom_phrase 的权重应该比 pinyin 和 melt_eng 大。
+  initial_quality: 99  # custom_phrase 的权重应该比 pinyin 和 melt_eng 大
 
 
-# 挂载拼音主词库
+# 引入八股文
+grammar:
+  language: zh-hans-t-essay-bgw
+
+
+# 拼音
 translator:
   dictionary: rime_ice
-  preedit_format: # preedit_format 影响到输入框的显示和“Shift+回车”上屏的字符
+  contextual_suggestions: true  # 开启八股文
+  preedit_format:             # preedit_format 影响到输入框的显示和“Shift+回车”上屏的字符
     - xform/([jqxy])v/$1u/    # 显示为 ju qu xu yu
     # - xform/([nl])v/$1ü/    # 显示为 nü lü
     # - xform/([nl])ue/$1üe/  # 显示为 nüe lüe
@@ -111,42 +135,47 @@ translator:
   initial_quality: 1.2  # 拼音的权重应该比英文大
 
 
-# 英文输入方案
+# 英文
 melt_eng:
   dictionary: melt_eng
-  spelling_hints: 9
   enable_completion: true # 补全提示
   enable_sentence: false  # 禁止造句
   enable_user_dict: false # 禁用用户词典
   initial_quality: 1.1
 
 
-# 八股文
-grammar:
-  language: zh-hans-t-essay-bgw
-translator/contextual_suggestions: true
-translator/max_homophones: 7
-translator/max_homographs: 7
-
-
-# 引入自己的修改过的 symbols
+# 标点符号
+# 预设的 punctuation.yaml 包含了 full_shape half_shape （全角和半角的符号映射）
+# 预设的 symbols.yaml     包含了 full_shape half_shape symbols
+# symbols 的功能是支持以「/」前缀开头输出一系列字符，自定义的 symbols_custom.yaml 修改成了「v」开头。
 punctuator:
-  # import_preset: symbols
-  import_preset: symbols_custom  # 标点符号和 v 模式在里面
+  # __include: punctuation:/     # 从应用目录引入预设的 punctuation.yaml
+  # import_preset: symbols       # 从应用目录引入预设的 symbols.yaml
+  import_preset: symbols_custom  # 从 symbols_custom.yaml 引入自己自定义的
+  # half_shape:                  # 也可以直接在这里配置
 
 
 # 处理符合特定规则的输入码，如网址、反查
 recognizer:
   patterns:
-    email: "^[A-Za-z][-_.0-9A-Za-z]*@.*$"
-    uppercase: "[A-Z][_+.'0-9A-Za-z]*$"
-    url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"
-    url_2: "^[a-z]+[.].*"     # 支持 google.com（不以 www 开头）的网址，会导致句号不会让句子上屏，或使用句号翻页时需要注释掉
-    win_path: "^[A-Za-z]:.*"  # 支持 c:\file\path 之类的路径输入
-    colon: "^[A-Za-z]+:.*"    # 上面的超集，冒号在句子中不直接上屏
-    # punct: "^/([0-9]+[a-z]*|[a-z]+)$"
-    punct: "^v([0-9]|10|[A-Za-z]+)$"  # 响应 punctuator/symbols(symbols_custom.yaml) 用「v」替换「/」并支持大写
-    reverse_lookup: "^u[A-Za-z]+$"    # 响应两分的反查
+    email: "^[A-Za-z][-_.0-9A-Za-z]*@.*$"                            # 自带的，e-mail 正则
+    # uppercase: "[A-Z][-_+.'0-9A-Za-z]*$"                           # 自带的，大写字母开头后，可以输入[-_+.'0-9A-Za-z]这些字符
+    url: "^(www[.]|https?:|ftp[.:]|mailto:|file:).*$|^[a-z]+[.].+$"  # 自带的，URL 正则
+    url_2: "^[A-Za-z]+[.].*"             # 支持 google.com abc.txt 等网址或文件名，会导致句号不会让句子上屏，或使用句号翻页时需要注释掉
+    win_path: "^[A-Za-z]:.*"             # 支持 c:\file\path 之类的路径输入
+    colon: "^[A-Za-z]+:.*"               # 上面的超集，可以输入冒号，不会导致句子直接上屏
+    # punct: "^/([0-9]+[a-z]*|[a-z]+)$"  # 响应默认的 punctuation/symbols 的「/」开头的字符
+    punct: "^v([0-9]|10|[A-Za-z]+)$"     # 响应 symbols_custom.yaml 下的 punctuator/symbols，用「v」替换「/」并支持大写
+    reverse_lookup: "^u[a-z]+$"          # 响应两分的反查
+
+
+# 反查：两分（拼字）
+liangfen:
+  dictionary: liangfen
+  prefix: "u"              # 以 u 开头来反查
+  enable_completion: true  # 补全提示
+  # tips: 〔两分〕
+
 
 # 拼写设定
 speller:
@@ -232,7 +261,7 @@ speller:
     - derive/([ypfm])ou$/$1uo/
     # uo（无）
     # an
-    - derive/([wrtypsfghklzcbnm])an$/$1na/  # 去掉了 n，不转换常用单词 DNA
+    - derive/([wrtypsdfghklzcbnm])an$/$1na/
     # en
     - derive/([wrpsdfghklzcbnm])en$/$1ne/
     # ang
