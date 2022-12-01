@@ -38,11 +38,7 @@ Rime	rime	3
 ⇧	shift
 GBK	gbk
 UTF-8	utfba
-macOS High Sierra	macos	2
-macOS Mojave	macos	3
 macOS	macos	4
-macOS Sierra	macos	1
-Google Analytics	ga
 macOS	macos
 Linux	linux
 CSS	css
@@ -52,8 +48,8 @@ iPad	ipad
 iPhone	iphone
 iTunes	itunes
 Python	py
-JavaScript	js
-TypeScript	ts
+JavaScript	jss
+TypeScript	tss
 jQuery	jquery
 MySQL	mysql
 SQL	sql
@@ -75,7 +71,6 @@ IPTV	iptv
 IPv4	ipv
 IPv6	ipv
 Mac App Store	mas
-OS X	osx
 GUN/Linux linux
 X-Ray	xray
 Xbox One	xbox
@@ -83,7 +78,6 @@ Youku	youku
 YouTube	youtube
 又双叒叕	yzyz
 iCloud	icloud
-Quantumult	quan
 Dropbox	dropbox
 T恤	txu
 Mac	mac
@@ -91,6 +85,7 @@ Wi-Fi	wifi
 Apple ID	appleid
 QQ邮箱	qqyzxl
 是介样	sjy
+啊  a 1
 去	q	1
 我	w	1
 他	t	1

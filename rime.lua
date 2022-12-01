@@ -19,7 +19,7 @@ function date_translator(input, seg)
         yield(cand)
     end
     -- 时间
-    if (input == "sj") then
+    if (input == "sjj") then
         local cand = Candidate("time", seg.start, seg._end, os.date("%H:%M"), "")
         cand.quality = 100
         yield(cand)
@@ -47,11 +47,11 @@ function date_translator(input, seg)
         yield(cand)
     end
     -- 时间戳（十位数，到秒，示例 1650861664）
-    if (input == "ts") then
-        local cand = Candidate("datetime", seg.start, seg._end, os.time(), "")
-        cand.quality = 100
-        yield(cand)
-    end
+    -- if (input == "ts") then
+    --     local cand = Candidate("datetime", seg.start, seg._end, os.time(), "")
+    --     cand.quality = 100
+    --     yield(cand)
+    -- end
 end
 -------------------------------------------------------------
 -- 以词定字
