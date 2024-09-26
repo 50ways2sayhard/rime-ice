@@ -61,8 +61,8 @@ patch:
       ascii_mode: true
 
   # 选择皮肤，亮色与暗色主题
-  style/color_scheme: wechat_light
-  style/color_scheme_dark: wechat_dark
+  style/color_scheme: macos_light
+  style/color_scheme_dark: macos_dark
   # style/color_scheme: purity_of_form_custom
   # style/color_scheme_dark: purity_of_form_custom
 
